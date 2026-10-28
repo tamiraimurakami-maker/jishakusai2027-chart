@@ -1,0 +1,776 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>理想のチームをさがせ！</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap">
+<style>
+/* Layout: 方眼の夜空に浮かぶYes/Noチャート盤面。行き先は伏せたまま道だけが光り、発表→深掘り→納得→応募の順に1枚ずつ開示する。単一ダークテーマ（意図的） */
+:root{
+  --ink:#0A0F1F;
+  --panel:#111A35;
+  --panel-2:#16224A;
+  --line:#2A3A6E;
+  --blue:#4A8BF5;
+  --pink:#FF2D87;
+  --yellow:#FFE45C;
+  --text:#EEF2FF;
+  --muted:#9AA6CC;
+  --grid:rgba(74,139,245,.09);
+  --display:"Dela Gothic One","Hiragino Sans","Yu Gothic",sans-serif;
+  --body:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic","Meiryo",sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{background:var(--ink)}
+body{
+  margin:0;color:var(--text);font-family:var(--body);font-size:15px;line-height:1.75;
+  background-color:var(--ink);
+  background-image:
+    linear-gradient(var(--grid) 1px,transparent 1px),
+    linear-gradient(90deg,var(--grid) 1px,transparent 1px),
+    radial-gradient(1200px 600px at 80% -10%,rgba(255,45,135,.16),transparent 60%),
+    radial-gradient(900px 500px at -10% 30%,rgba(74,139,245,.18),transparent 60%);
+  background-size:28px 28px,28px 28px,auto,auto;
+  background-attachment:fixed;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  overflow-x:hidden;
+}
+.wrap{max-width:1120px;margin:0 auto;padding-block:20px 64px}
+button{font-family:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
+h1,h2,h3{text-wrap:balance;margin:0}
+
+/* ---------- top bar ---------- */
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px;min-height:30px}
+.brand{font-family:var(--display);font-size:13px;letter-spacing:.08em;color:var(--muted)}
+.brand b{color:var(--text);font-weight:400}
+.deadline{display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--yellow);color:var(--yellow);
+  border-radius:999px;padding:4px 14px;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
+.deadline .dot{width:8px;height:8px;border-radius:50%;background:var(--yellow);box-shadow:0 0 10px var(--yellow)}
+
+/* ---------- intro ---------- */
+.intro{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:36px;align-items:center}
+.eyebrow{display:inline-block;background:var(--pink);color:#fff;font-family:var(--display);font-size:13px;
+  padding:3px 12px;border-radius:6px;transform:rotate(-3deg);letter-spacing:.06em;box-shadow:0 0 18px rgba(255,45,135,.5)}
+.intro h1{font-family:var(--display);font-weight:400;font-size:clamp(36px,5.2vw,68px);line-height:1.12;margin:14px 0 14px;letter-spacing:.01em}
+.intro h1 .nw{white-space:nowrap}
+.intro h1 .y{color:var(--yellow);text-shadow:0 0 24px rgba(255,228,92,.35)}
+.lead{color:#D5DBF5;font-size:16px;max-width:30em;margin:0 0 22px}
+.meta{display:flex;gap:18px;flex-wrap:wrap;color:var(--muted);font-size:13px;margin-bottom:24px}
+.meta b{color:var(--text);font-size:15px}
+.cta-start{background:var(--pink);color:#fff;border:0;border-radius:14px;font-family:var(--display);font-size:22px;
+  padding:16px 34px;box-shadow:0 6px 0 #a3104f,0 0 30px rgba(255,45,135,.45);transition:transform .12s}
+.cta-start:hover{transform:translateY(-2px)}
+.cta-start:active{transform:translateY(3px);box-shadow:0 3px 0 #a3104f}
+.facts{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px}
+.fact{border-left:3px solid var(--blue);padding:2px 0 2px 10px;font-size:12px;color:var(--muted);line-height:1.5}
+.fact b{display:block;font-family:var(--display);font-weight:400;font-size:20px;color:var(--text);font-variant-numeric:tabular-nums}
+
+/* ---------- board ---------- */
+.board{position:relative;background:linear-gradient(180deg,rgba(17,26,53,.85),rgba(10,15,31,.85));
+  border:1px solid var(--line);border-radius:18px;padding:12px;min-width:0}
+.board svg{display:block;width:100%;height:auto}
+.legend{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--muted);padding:6px 6px 0}
+.legend span b{color:var(--pink)}
+.n circle{fill:#0E1630;stroke:var(--line);stroke-width:2.5;transition:all .35s}
+.n text{fill:var(--muted);font-family:var(--body);font-weight:700;font-size:13px;transition:fill .35s}
+.n .qm{font-family:var(--display);font-size:22px;fill:var(--yellow);display:none}
+.n.done circle{stroke:var(--pink);fill:#3a1033}
+.n.done text{fill:#FFD0E4}
+.n.cur circle{stroke:var(--yellow);fill:#2b2a12}
+.n.cur text{fill:var(--yellow)}
+.n.cur{animation:pulse 1.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes pulse{50%{transform:scale(1.07)}}
+.e{stroke:var(--line);stroke-width:3;fill:none}
+.e.lit{stroke:var(--pink);stroke-dasharray:200;stroke-dashoffset:200;animation:draw .45s ease-out forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.t rect{fill:#13204a;stroke:var(--blue);stroke-width:2;transition:all .4s}
+.t text{fill:#CFE0FF;font-family:var(--body);font-weight:900;font-size:15px}
+.t .mk{font-family:var(--display);font-size:26px;fill:#5d74b8;display:none}
+.t.win rect{fill:var(--pink);stroke:#fff}
+.t.win text{fill:#fff}
+.t.alt rect{stroke:var(--yellow);stroke-dasharray:5 4}
+/* 伏せモード：質問のキーワードと行き先を隠す */
+.masked .n .lbl{display:none}
+.masked .n.cur .qm{display:block}
+.masked .t .real{display:none}
+.masked .t .mk{display:block}
+.masked .t rect{fill:#0f1836;stroke:#33467f;stroke-dasharray:4 5}
+/* 明かしモード：行き先が順に現れる */
+.unveil .t{animation:pop .5s ease-out both}
+@keyframes pop{from{opacity:0;transform:scale(.8)}}
+.unveil .t{transform-box:fill-box;transform-origin:center}
+
+/* ---------- play ---------- */
+.play{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:24px;align-items:start}
+.qcard{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:26px 24px 22px;position:relative;overflow:hidden}
+.qcard::before{content:"";position:absolute;inset:0 0 auto;height:4px;background:linear-gradient(90deg,var(--blue),var(--pink))}
+.qstep{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted);letter-spacing:.06em;font-weight:700}
+.qstep .tag{color:var(--yellow)}
+.qtext{font-family:var(--display);font-weight:400;font-size:clamp(24px,3.4vw,34px);line-height:1.35;margin:22px 0 26px;min-height:2.7em}
+.qtext.in{animation:qin .35s ease-out}
+@keyframes qin{from{opacity:.2;transform:translateY(8px)}}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ans{border-radius:14px;font-family:var(--display);font-size:24px;padding:16px 0;border:2px solid transparent;transition:transform .1s}
+.ans:active{transform:scale(.97)}
+.ans.yes{background:var(--pink);color:#fff;box-shadow:0 5px 0 #a3104f}
+.ans.no{background:transparent;color:var(--text);border-color:#4B5C93;box-shadow:0 5px 0 #26335c}
+.ans small{display:block;font-family:var(--body);font-size:11px;font-weight:700;opacity:.8;margin-top:-2px}
+.qfoot{display:flex;justify-content:space-between;align-items:center;margin-top:16px;font-size:12px;color:var(--muted)}
+.link-btn{background:none;border:0;color:var(--muted);font-size:13px;text-decoration:underline;padding:4px}
+.link-btn:disabled{opacity:.35;cursor:default}
+.hint{margin-top:14px;font-size:12px;color:var(--muted)}
+
+/* ---------- reveal ---------- */
+.reveal{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;flex-direction:column;
+  background:rgba(6,9,20,.95);text-align:center;
+  padding:max(24px,env(safe-area-inset-top,0px)) max(20px,env(safe-area-inset-right,0px)) max(24px,env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px))}
+.reveal .pre{font-size:16px;color:var(--muted);letter-spacing:.1em;animation:fade .6s ease-out}
+.reveal .team{font-family:var(--display);font-size:clamp(42px,10vw,104px);line-height:1.08;margin:10px 0 6px;
+  color:#fff;text-shadow:0 0 30px rgba(255,45,135,.8),0 0 70px rgba(255,45,135,.45);opacity:0}
+.reveal .team.sm{font-size:clamp(30px,7vw,64px);text-wrap:balance;word-break:keep-all;max-width:12em}
+.reveal .team.go{animation:slam .55s cubic-bezier(.2,1.6,.4,1) forwards}
+@keyframes slam{from{opacity:0;transform:scale(1.8)}to{opacity:1;transform:scale(1)}}
+.reveal .en{font-family:var(--display);color:var(--yellow);letter-spacing:.3em;font-size:14px;opacity:0}
+.reveal .catch{max-width:28em;color:#D5DBF5;margin:16px auto 26px;opacity:0;font-size:16px}
+.reveal .go-fade{animation:fade .5s ease-out forwards}
+.reveal .btns{display:flex;flex-direction:column;align-items:center;gap:10px;opacity:0}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.burst{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.burst i{position:absolute;width:8px;height:14px;top:-20px;border-radius:2px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+
+/* ---------- result (1枚ずつ) ---------- */
+.result{max-width:760px;margin:0 auto}
+.steps{display:flex;gap:6px;margin-bottom:14px}
+.steps i{flex:1;height:5px;border-radius:3px;background:#22305c;transition:background .3s}
+.steps i.on{background:var(--pink);box-shadow:0 0 8px rgba(255,45,135,.6)}
+.slabel{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.06em;margin-bottom:10px}
+.slabel b{color:var(--yellow);font-weight:700}
+.slide{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:28px 24px 26px;min-height:360px;animation:sin .4s ease-out}
+@keyframes sin{from{opacity:0;transform:translateX(16px)}}
+.slide h2{font-family:var(--display);font-weight:400;font-size:clamp(24px,4.4vw,34px);line-height:1.3;margin-bottom:16px}
+.slide p{margin:0 0 12px}
+.nav{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:16px}
+.nav .next{background:var(--blue);color:#fff;border:0;border-radius:14px;font-family:var(--display);font-size:18px;padding:13px 28px;box-shadow:0 5px 0 #2b5db0}
+.nav .next:active{transform:translateY(3px);box-shadow:0 2px 0 #2b5db0}
+.hero-s{background:radial-gradient(600px 300px at 90% 0%,rgba(255,45,135,.35),transparent 70%),linear-gradient(160deg,#1A2758,#0E1530);border-color:#3a4b8a}
+.hero-s .kicker{font-size:13px;color:var(--muted);font-weight:700;letter-spacing:.08em}
+.hero-s .tname{font-family:var(--display);font-weight:400;font-size:clamp(40px,8vw,76px);line-height:1.08;margin:6px 0 14px;text-shadow:0 0 30px rgba(255,45,135,.45)}
+.type{display:inline-flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px;background:var(--yellow);color:#1b1600;border-radius:10px;padding:8px 14px;
+  font-weight:900;font-size:14px;transform:rotate(-1deg)}
+.type b{font-family:var(--display);font-weight:400;font-size:21px}
+.hero-s .catch{font-size:17px;font-weight:700;margin:20px 0 0}
+.reason{font-size:18px;font-weight:700;line-height:1.85}
+.reason em{font-style:normal;color:var(--yellow)}
+.fit-head{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.06em;margin-top:18px}
+.fit{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.fit li::before{content:"✓";color:var(--yellow);font-weight:900;margin-right:8px}
+.unitname{font-weight:900;color:var(--yellow);font-size:15px;margin-bottom:10px}
+.jobs{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:8px;font-size:16px}
+.desc{color:var(--muted);font-size:14px;margin-top:16px!important}
+.big{font-family:var(--display);font-size:clamp(52px,11vw,88px);line-height:1;color:var(--yellow);font-variant-numeric:tabular-nums;
+  text-shadow:0 0 26px rgba(255,228,92,.35);margin:10px 0 12px}
+.big small{font-size:.34em;color:var(--text);margin-left:6px}
+.stat-lab{font-weight:900;font-size:16px}
+.stat-note{color:var(--muted);font-size:14px}
+.voice{margin-top:20px;padding:14px 16px;border-radius:12px;background:var(--panel-2);font-size:15px;font-weight:700}
+.voice span{display:block;font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.06em;margin-bottom:2px}
+.route{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:7px}
+.route li{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.55}
+.yn{flex:none;font-family:var(--display);font-size:11px;border-radius:5px;padding:2px 7px;margin-top:2px;min-width:38px;text-align:center}
+.yn.y{background:var(--pink);color:#fff}
+.yn.n{border:1.5px solid #4B5C93;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chip{border:1px solid #3a4b8a;border-radius:999px;padding:4px 12px;font-size:13px;background:#0E1630}
+.apply-s{background:linear-gradient(140deg,#ff2d87,#b5126a);border-color:#ff6aa9;box-shadow:0 0 40px rgba(255,45,135,.3)}
+.apply-s .chip{background:rgba(0,0,0,.18);border-color:rgba(255,255,255,.35)}
+.apply-s .fit-head{color:rgba(255,255,255,.8)}
+.apply-btn{display:inline-block;margin-top:24px;background:var(--yellow);color:#1b1600;text-decoration:none;font-family:var(--display);font-size:22px;border-radius:14px;padding:15px 30px;
+  box-shadow:0 5px 0 #a8901a}
+.apply-btn:active{transform:translateY(3px);box-shadow:0 2px 0 #a8901a}
+.dl{margin-top:14px;font-size:13px;font-variant-numeric:tabular-nums;font-weight:700}
+.small{font-size:12px;opacity:.85}
+.extra{display:flex;flex-direction:column;gap:22px}
+.extra h3{font-family:var(--display);font-weight:400;font-size:18px;margin-bottom:8px}
+.alt-name{font-family:var(--display);font-size:24px}
+.units{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+.unit{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:#0E1630;font-size:13px;line-height:1.6}
+.unit b{display:block;font-size:14px;margin-bottom:4px}
+.unit.me{border-color:var(--pink);box-shadow:0 0 0 1px var(--pink) inset;background:#24112c}
+.unit.me b::after{content:"あなた";margin-left:8px;font-size:10px;background:var(--pink);color:#fff;border-radius:4px;padding:1px 6px;vertical-align:2px}
+.share textarea{width:100%;min-height:80px;resize:vertical;background:#0E1630;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px;font-family:inherit;font-size:13px}
+.row-btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.btn{border-radius:12px;padding:11px 18px;font-weight:900;font-size:14px;border:1.5px solid #4B5C93;background:transparent;color:var(--text);text-decoration:none}
+.btn.pri{background:var(--blue);border-color:var(--blue);color:#fff}
+.copied{font-size:12px;color:var(--yellow);min-height:1em;margin-top:6px}
+.tlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+details.tc{background:#0E1630;border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+details.tc[open]{border-color:var(--blue)}
+details.tc.me{border-color:var(--pink)}
+details.tc summary{cursor:pointer;list-style:none;display:flex;flex-direction:column;gap:2px}
+details.tc summary::-webkit-details-marker{display:none}
+details.tc summary b{font-family:var(--display);font-weight:400;font-size:17px}
+details.tc summary span{font-size:12px;color:var(--muted);line-height:1.5}
+details.tc .body{margin-top:10px;font-size:13px;line-height:1.65;color:#D5DBF5}
+details.tc .body ul{margin:6px 0 0;padding-left:1.1em}
+hr.sep{border:0;border-top:1px dashed var(--line);margin:0}
+.foot{margin-top:40px;font-size:12px;color:var(--muted);text-align:center;line-height:1.8}
+
+[hidden]{display:none!important}
+@media (max-width:860px){
+  .intro,.play{grid-template-columns:minmax(0,1fr)}
+  .intro{gap:22px}
+  .play{gap:14px}
+  .qcard{padding:22px 18px 18px}
+  .qtext{margin:16px 0 20px}
+  .slide{padding:22px 18px;min-height:0}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}
+  .e.lit{stroke-dashoffset:0}
+  .reveal .team,.reveal .en,.reveal .catch,.reveal .btns{opacity:1}
+}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><b>磁石祭製作委員会2027</b>　Yes/Noチャート</div>
+    <div class="deadline" id="deadline"><span class="dot"></span><span id="dl-text">応募締切 11/2（月）11:59</span></div>
+  </div>
+
+  <!-- INTRO -->
+  <section id="intro" class="intro">
+    <div>
+      <span class="eyebrow">START!</span>
+      <h1><span class="nw">理想のチームを</span><br><span class="y nw">さがせ！</span></h1>
+      <p class="lead">磁石祭をつくるチームの中で、あなたが一番輝けるのはどこ？ 直感でYESかNOを選んでいくだけ。行き先は、最後まで秘密です。</p>
+      <div class="meta"><span><b>約1分</b>　で終わる</span><span><b>3〜9問</b>　答えで変わる</span></div>
+      <button class="cta-start" id="startBtn">診断スタート</button>
+      <div class="facts">
+        <div class="fact"><b>約19万人</b>磁石祭2026 ニコニコ生放送の来場者</div>
+        <div class="fact"><b>1,545万円</b>51社からの企業協賛</div>
+      </div>
+    </div>
+    <div class="board" id="introBoard"></div>
+  </section>
+
+  <!-- PLAY -->
+  <section id="play" class="play" hidden>
+    <div class="board" id="playBoard"></div>
+    <div class="qcard">
+      <div class="qstep"><span id="qPhase">STEP 1</span><span class="tag" id="qCount">Q1</span></div>
+      <h2 class="qtext" id="qText"></h2>
+      <div class="answers">
+        <button class="ans yes" id="yesBtn">YES<small>あてはまる</small></button>
+        <button class="ans no" id="noBtn">NO<small>ちがうかも</small></button>
+      </div>
+      <div class="qfoot">
+        <button class="link-btn" id="backBtn">← ひとつ戻る</button>
+        <button class="link-btn" id="resetBtn">トップへ戻る</button>
+      </div>
+      <div class="hint" id="qHint">深く考えすぎず、直感で選んでOK。</div>
+    </div>
+  </section>
+
+  <!-- RESULT -->
+  <section id="result" class="result" hidden>
+    <div class="steps" id="steps"></div>
+    <div class="slabel"><span id="sName"></span><span style="display:flex;gap:12px;align-items:center"><button class="link-btn" id="restartBtn" style="font-size:12px;padding:0">最初からやり直す</button><b id="sNum"></b></span></div>
+    <div id="slideBox"></div>
+    <div class="nav">
+      <button class="link-btn" id="prevBtn">← 戻る</button>
+      <button class="next" id="nextBtn">次へ</button>
+    </div>
+  </section>
+
+  <p class="foot">磁石祭2027の情報は Slack の #磁石祭2027_お知らせ で発信中。<br>質問は #磁石祭2027_問い合わせ へ。</p>
+</div>
+
+<div class="reveal" id="reveal" hidden>
+  <div class="burst" id="burst"></div>
+  <div class="pre" id="rvPre"></div>
+  <div class="en" id="rvEn"></div>
+  <div class="team" id="rvTeam"></div>
+  <p class="catch" id="rvCatch"></p>
+  <div class="btns" id="rvBtns">
+    <button class="cta-start" id="rvNext"></button>
+    <span style="font-size:12px;color:var(--muted)" id="rvNote"></span>
+    <button class="link-btn" id="rvBack" style="margin-top:6px">← 答えを直す</button>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+/* ===== 設定 ===== */
+var APPLY_URL = "https://forms.gle/5dvZuejyojCzKbt47";
+var DEADLINE = new Date("2026-11-02T11:59:00+09:00");
+/* 集計用Googleフォームの事前入力URL。{team} と {unit} が結果に置き換わる。空なら「結果を送る」ボタンは出さない */
+var RESULT_FORM_URL = "";
+
+/* ===== 元チャートの15問（行=r, 列=c） YESで右、NOで下。trait は「向いている理由」の文章に使う ===== */
+var Q = [
+  [ {t:"THE磁石祭を感じたい",l:["THE","磁石祭"],tr:"磁石祭のど真ん中を感じたい気持ち"},
+    {t:"花形に興味がある",l:["花形"],tr:"注目の舞台に関わりたい思い"},
+    {t:"大勢の歓声の中で動いてみたい",l:["大歓声"],tr:"大勢の歓声の中で動けるエネルギー"},
+    {t:"リアル会場の目玉企画を作りたい",l:["目玉","企画"],tr:"会場の主役をつくりたい野心"},
+    {t:"1番人数が多いチームに行きたい",l:["大人数"],tr:"大きなチームで動く行動力"} ],
+  [ {t:"番組や配信を見るのが好き",l:["番組","配信"],tr:"番組や配信を楽しむアンテナ"},
+    {t:"番組制作に興味がある",l:["番組","制作"],tr:"番組づくりへの興味"},
+    {t:"本番前から、みんなをワクワクさせたい",l:["本番前"],tr:"本番前から人をワクワクさせたい気持ち"},
+    {t:"台本や段取りを考えるのが好き",l:["台本","段取り"],tr:"台本や段取りを組み立てる力"},
+    {t:"配信やテレビの裏側に興味がある",l:["裏側"],tr:"配信の裏側への好奇心"} ],
+  [ {t:"SNSをついつい見ちゃう",l:["SNS"],tr:"SNSへのアンテナ"},
+    {t:"「バズ」に興味がある",l:["バズ"],tr:"バズへの興味"},
+    {t:"磁石祭の魅力を、学園の外にも伝えたい",l:["魅力","発信"],tr:"魅力を外に伝えたい気持ち"},
+    {t:"反応を見ながら、やり方を工夫するのが好き",l:["反応","工夫"],tr:"反応を見て工夫する力"},
+    {t:"自分の高校の文化祭を、人に自慢したい",l:["自慢"],tr:"自分たちの文化祭を誇る気持ち"} ]
+];
+/* 右の行き先：YESが5回たまった人（NOの回数で行が決まる）。下の行き先：NOが3回たまった人（YESの回数で列が決まる）
+   応募を増やしたい事前事後・広報・オンラインを、YESが多めでも少なめでも着きやすい位置に置く */
+var RIGHT = ["stage","prepost","pr"];
+var BOTTOM = ["obog","creative","online","booth","studio"];
+/* 最後の分かれ道で逆を選ぶと進む先のチーム */
+var NEXT = {stage:"prepost",prepost:"pr",pr:"studio",studio:"pr",booth:"studio",online:"booth",creative:"online",obog:"creative"};
+
+/* ===== チームデータ（説明会資料より）。班診断の質問は、仕事名ではなく好きなこと・価値観で聞く ===== */
+var T = {
+ stage:{name:"ライブステージ",en:"LIVE STAGE",label:["ライブ","ステージ"],
+  catch:"磁石祭リアル会場で、豪華ゲストや学園生徒と一緒にステージを盛り上げるチーム！",
+  desc:"幕張メッセの会場にある、磁石祭のメインステージを担当するチームです。ステージでは2日間、ゲストのライブや、部活動・生徒による発表が次々に行われます。",
+  stat:{n:63850,u:"視聴",lab:"磁石祭2026 ニコニコ生放送 累計視聴数",note:"国立競技場が満員になる人数が視聴しました"},
+  voice:{k:"来年チャレンジしたいこと",v:"ステージって本番だけじゃなく事前の盛り上げが大事。事前交流イベントや出演者オーディションなど、視聴者数を増やす施策をたくさん実行したい！"},
+  challenge:["オープニング・エンディングを一から作る","オーディションなどで本番前から盛り上げる"],
+  skills:["たくさんの人と準備を進める段取り力","ゲストや企業の方とやり取りする経験","ゼロから演出を考える企画力"],
+  fit:["自ら積極的に動ける人","状況把握が得意な人","アイデアがカタチになるワクワクが好きな人"],
+  units:{
+   opd:{name:"オープニング・エンディング制作",nick:"幕開けをデザインする人",jobs:["始まりと終わりを飾るステージを、ゼロから企画","ゲストや企業の方と連絡を取りながら形にする","本番を盛り上げる演出やしかけを考える"]},
+   focus:{name:"PMO（進行サポート）注力企画",nick:"主役を輝かせる人",jobs:["歌ってみた・生徒会企画審査会など、人気企画を担当","出演者と一緒に、本番までの準備・リハーサルを進める","ゲストを含む出演者が、安心して出演できるよう支える"]},
+   general:{name:"PMO（進行サポート）一般企画",nick:"挑戦を本番まで導く人",jobs:["全校生徒から集まったステージ企画を担当","企画が本番までに形になるよう、スケジュールを一緒に管理","台本や演出が良くなるアイデアを出す"]}
+  },
+  tree:{q:"まだ誰も見たことがないものを、ゼロから生み出したい",y:"opd",n:{q:"スポットライトを浴びる人を、すぐそばで支えたい",y:"focus",n:"general"}}},
+ studio:{name:"ライブスタジオ",en:"LIVE STUDIO",label:["ライブ","スタジオ"],
+  catch:"豪華ゲストと一緒に、リアル会場もオンライン会場も盛り上げる番組企画を作るチーム！",
+  desc:"会場内のスタジオから、インターネットで番組を生配信するチームです。会場に来られない全国の生徒にも、文化祭の楽しさを届けます。",
+  stat:{n:25406,u:"視聴",lab:"磁石祭2026 ニコニコ生放送 累計視聴数",note:"東京ドーム約半分の人数が視聴しました"},
+  voice:{k:"来年チャレンジしたいこと",v:"もっと話題性を生みたい！もっと盛り上げたい！ライブスタジオにしかできないユニークな企画（職業体験と連動したロケ企画、食レポ企画など）で視聴数につなげる！"},
+  challenge:["番組を自分たちで一から企画する","スタジオならではの番組に挑戦"],
+  skills:["番組の企画・構成力","ゲストを迎える段取り力","人を支えるサポート力"],
+  fit:["人を楽しませることが好きな人","「やってみたい！」と思える人","情報整理やサポートが得意な人"],
+  units:{
+   main:{name:"企画制作（目玉番組）",nick:"番組をゼロから生む人",jobs:["文化祭の目玉になる番組を、テーマから考えて作る","台本・進行・演出をチームで組み立てる","番組を見てもらうための告知のしかけも考える"]},
+   guest:{name:"企画制作（ゲスト番組）",nick:"ゲストと番組をつくる人",jobs:["ゲストを迎える番組を、決まった型に沿って作る","ゲストに合わせて、トークや企画の内容を考える","ゲストや企業の方との連絡・当日の案内"]},
+   pmo:{name:"PMO（進行サポート）",nick:"全校の番組を支える人",jobs:["全校生徒から集まった番組を担当","番組が本番までに形になるよう、スケジュールを一緒に管理","企画内容や台本のアドバイス"]}
+  },
+  tree:{q:"自分のアイデアで、画面の向こうの人を楽しませたい",y:{q:"相手に合わせて、話の流れを組み立てるのが得意",y:"guest",n:"main"},n:"pmo"}},
+ booth:{name:"ブース",en:"BOOTH",label:["ブース"],
+  catch:"学園生・一般来場者にとって、魅力的なブースの主要企画を作るチーム！",
+  desc:"幕張メッセの会場に並ぶブースのうち、委員会が企画する人気ブースを担当するチームです。飲食・インタビュー・特別物販の3つのブースがあり、企画を考えるところから当日お客さんを迎えるところまで担当します。",
+  stat:{n:2490,u:"人",lab:"磁石祭2026 飲食・インタビューブース 来場者合計",note:"大型のコンサートホールが満員になる人数が来場しました"},
+  voice:{k:"みんなに伝えたい一言",v:"シンプルイズザベスト。文化祭っぽいこと、したくない？？"},
+  challenge:["ブースごとに、企画から当日まで担当","オリジナリティのあるブースづくりに挑戦"],
+  skills:["お客さんの目線で考える企画力","当日の運営力","ゲストや来場者への対応力"],
+  fit:["色んな人と話すことが好きな人","アイデアを考えることが好きな人","物の販売や飲食店の運営に興味がある人"],
+  units:{
+   food:{name:"飲食",nick:"文化祭の味をつくる人",jobs:["ブースの「コンセプト」（テーマ）から考える","メニューや見せ方を考えて、飲食ブースを作る","当日のブース運営・お客さんの案内"]},
+   interview:{name:"インタビュー",nick:"声を引き出す人",jobs:["有名人ゲストやN高グループ生へのインタビュー企画を考える","当日のインタビューの進行","ブースの運営・来場者の案内"]},
+   goods:{name:"特別物販",nick:"特別な一品を届ける人",jobs:["有名人から私物などを提供してもらい、販売するブースを作る","提供のお願い（アタック）や商品の準備","当日の販売・ブース運営"]}
+  },
+  tree:{q:"憧れの人と、直接やりとりしてみたい",y:{q:"人の話を聞いて、深掘りするのが好き",y:"interview",n:"goods"},n:"food"}},
+ online:{name:"オンライン",en:"ONLINE",label:["オンライン"],
+  catch:"オンライン企画のマネジメントと制作で、オンライン会場を盛り上げるチーム！",
+  desc:"パソコンやスマホから参加できる「オンライン会場」を担当するチームです。全国の生徒が作ったイラストや動画、配信などの企画が並び、どこに住んでいても文化祭を楽しめます。",
+  stat:{n:47993,u:"UU",lab:"磁石祭2026 オンラインサイト UU数",note:"東京ドームがほぼ満席になる人数がアクセスしました"},
+  voice:{k:"スタッフから",v:"「新しい正解」を一緒に探そう！って思ってくれる人、大募集。みんなが「うおおお！」となる日本一のオンライン文化祭を作りたい！"},
+  challenge:["委員会のメンバーで目玉企画を作る","「参加して楽しい」会場づくりに挑戦"],
+  skills:["たくさんの企画を同時に進める管理力","Webで楽しめる企画をつくる力"],
+  fit:["情報整理が好きな人","マルチタスクが得意な人","デジタルコンテンツが好きな人"],
+  units:{
+   pmo:{name:"PMO（進行サポート）",nick:"全国の作品を公開へ導く人",jobs:["全校生徒から集まった企画を、1人数件ずつ担当","企画が期限までに公開できるよう、出展者と連絡を取りながら進める","曲やイラストの著作権（使ってよいかのルール）を確認する","出展者からの質問に答え、困りごとを一緒に解決する"]},
+   make:{name:"企画制作",nick:"オンラインの目玉をつくる人",jobs:["オンライン会場にずっと置かれる「常設企画」を作る","みんなが参加できる企画や、配信企画を作る","企画を見てもらうための告知のしかけを考える","チームでアイデアを出し合い、公開まで形にする"]}
+  },
+  tree:{q:"みんなが思わず参加したくなる仕掛けを、考えるのが好き",y:"make",n:"pmo"}},
+ pr:{name:"広報",en:"PR",label:["広報"],
+  catch:"「文化祭」を広報の力で支えるチーム！",
+  desc:"文化祭の魅力をSlackやSNSで発信して、「参加したい！」「行ってみたい！」と思う人を増やすチームです。学園の生徒に向けた発信と、学園の外の人に向けた発信の両方を担当します。",
+  stat:{n:4,u:"媒体",lab:"Slack・N Lobby・X・Instagram",note:"媒体ごとに目標を決めて、チームで達成をめざします"},
+  voice:{k:"来年チャレンジしたいこと",v:"自分の高校の文化祭をバズらせて、人に自慢したくないですか？「磁石祭」という名前そのものを、もっと話題にする広報を！"},
+  challenge:["SNSごとに目標を決めて達成をめざす","文化祭全体を伝える広報企画に挑戦"],
+  skills:["反応を見て改善するSNS運用力","伝わる発信を考える企画力"],
+  fit:["SNSをついつい見ちゃう人","「バズ」に興味がある人","分析が好きな人"],
+  units:{
+   sns:{name:"SNS運用",nick:"数字で届け方を磨く人",jobs:["Slack・N Lobby（学園内の掲示板）・X・Instagramの担当に分かれて発信","文化祭の見どころや最新情報を投稿する","投稿の反応（見られた数・いいね数など）を見て、次の投稿を工夫する","目標を決めて、チームで達成をめざす"]},
+   plan:{name:"広報企画",nick:"磁石祭の名前を広める人",jobs:["SNSの種類にとらわれず、文化祭を広める企画を考える","たとえば、準備の様子を追いかけるドキュメンタリー動画など","企画を考えるだけでなく、実行まで担当する"]}
+  },
+  tree:{q:"数字の変化を見ながら、やり方を工夫していくのが楽しい",y:"sns",n:"plan"}},
+ creative:{name:"クリエイティブ",en:"CREATIVE",label:["クリエイティブ"],
+  catch:"磁石祭の顔になるデザイン・動画を技術で支えるチーム！",
+  desc:"ロゴやマスコット、Tシャツなど文化祭の「顔」になるデザインや、ほかのチームから頼まれたイラスト・動画を作るチームです。作ったものは、会場や配信、SNSでたくさんの人の目に届きます。",
+  stat:{n:5,u:"つの顔",lab:"マスコット・ロゴ・Tシャツ・ポスター・テーマソング",note:"文化祭の「顔」を、全校生徒からの募集で決めます"},
+  voice:{k:"説明会より",v:"友達にデザイン得意な子いますか？「一緒に青春しようぜ」って、ぜひ誘ってほしい！"},
+  challenge:["3チームに分かれ、相談しやすい体制に","マスコットなどの募集を生徒の手で運営"],
+  skills:["頼まれたイメージを形にする制作力","進路に生かせる制作実績","企画を運営する経験"],
+  fit:["創作が好きな人","大規模な文化祭で作品を披露したい人","進路で活きる制作実績が欲しい人"],
+  units:{
+   design:{name:"デザイン",nick:"イメージを形にする人",jobs:["ほかのチームから頼まれたイラスト・画像を作る","配信のサムネイル（表紙画像）や告知画像を作る","チームで相談しながら、頼まれたイメージを形にする"]},
+   movie:{name:"動画",nick:"映像で心を動かす人",jobs:["ほかのチームから頼まれた動画を作る","会場や配信で流れる映像を編集する","After Effects・Premiere Proの担当に分かれて制作"]},
+   content:{name:"コンテンツ制作",nick:"文化祭の顔を全校から集める人",jobs:["マスコット・ロゴ・Tシャツ・ポスター・テーマソングを全校生徒から募集","募集の告知や説明会を開き、応募を集める","文化祭全体の見た目やイメージに、まとまりを出す"]}
+  },
+  tree:{q:"手を動かして、ひとつの作品を仕上げる時間が好き",y:{q:"音やテンポで、見る人の気持ちを動かしたい",y:"movie",n:"design"},n:"content"}},
+ prepost:{name:"事前事後配信",en:"PRE / POST LIVE",label:["事前事後","配信"],
+  catch:"磁石祭の情報を配信で発信していくチーム！",
+  desc:"文化祭の「前」と「後」に、インターネットで特別番組を配信するチームです。本番前は見どころを伝えて期待を高め、本番後は思い出を振り返る番組を届けます。",
+  stat:{n:38626,u:"視聴",lab:"磁石祭2026 ニコニコ生放送 配信累計視聴数",note:"スタジアムがほぼ満席になる人数が視聴しました"},
+  voice:{k:"スタッフのイチオシポイント",v:"企画制作・広報など業務が幅広いから、たくさんのことが経験できる！総合型選抜を考えている人、必見です！"},
+  challenge:["2チームで番組を分担して、じっくり制作","総合司会を支えるチームが新しく加わる"],
+  skills:["台本・スライドを作る力","番組を裏側から動かすディレクション経験","たくさんの出演者をまとめる調整力"],
+  fit:["大人数が関わる企画が好きな人","発信力・企画力を磨きたい人","配信やテレビの裏側に興味がある人"],
+  units:{
+   make:{name:"配信企画",nick:"特別番組をつくる人",jobs:["特別番組の内容を、テーマから考える","台本・スライド・サムネイル（番組の表紙画像）を作る","出演者と連絡を取り、当日の流れを整える","SNSなどで番組の告知をする"]},
+   host:{name:"総合司会チーム",nick:"司会者を裏側から支える人",jobs:["文化祭全体の司会を担当する生徒を、裏側から支える","司会者向けの説明会や練習会（ワークショップ）を開く","※司会者そのものの募集ではありません"]}
+  },
+  tree:{q:"目立つ人の力を、裏側から引き出すのが好き",y:"host",n:"make"}},
+ obog:{name:"OB/OG連携企画",en:"OB / OG",label:["OB/OG連携"],
+  catch:"卒業生と磁石祭をつなぐ、2027年度からの新しいチーム！",
+  desc:"卒業生が集まるOB/OGブースを会場に作ったり、卒業生向けのイベントを企画したりして、卒業生と磁石祭をつなぐチームです。2027年度に生まれたばかりなので、最初の形を自分たちで作れます。",
+  stat:{n:2027,u:"年度 新設",lab:"今年スタートする、いちばん新しいチーム",note:"前例がないぶん、やり方から自分たちで決められます",raw:true},
+  voice:null,
+  challenge:["卒業生が集まるOB/OGブースを会場に作る"],
+  skills:[],
+  fit:["新しい挑戦をしてみたい人","人を繋ぐことが好きな人","卒業後のキャリアに興味がある人"],
+  units:{
+   team:{name:"OB/OG連携チーム",nick:"卒業生と磁石祭をつなぐ人",jobs:["卒業生が集まるOB/OGブースを会場に作る","卒業生向けのイベントを企画・運営する","卒業生と連絡を取り、参加を呼び掛ける"]}
+  },
+  tree:"team"}
+};
+
+/* ===== 盤面（SVG） ===== */
+var CX=[70,195,320,445,570], RY=[70,205,340], R=40, TX=666, TW=84, BY=432, BH=58, BW=112;
+function tlines(lines,x,y,cls){
+  var h=16, s=y-(lines.length-1)*h/2+5, o="";
+  lines.forEach(function(l,i){o+='<text class="'+cls+'" x="'+x+'" y="'+(s+i*h)+'" text-anchor="middle">'+l+'</text>';});
+  return o;
+}
+function boardSVG(id){
+  var o='<svg viewBox="0 0 760 504" role="img" aria-label="Yes/Noチャートの盤面">'+
+  '<defs>'+
+  '<filter id="glowP'+id+'" filterUnits="userSpaceOnUse" x="0" y="0" width="760" height="504"><feGaussianBlur stdDeviation="3.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'+
+  '<filter id="glowY'+id+'" filterUnits="userSpaceOnUse" x="0" y="0" width="760" height="504"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'+
+  '<marker id="arrDim'+id+'" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#2A3A6E"/></marker>'+
+  '<marker id="arrLit'+id+'" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#FF2D87"/></marker>'+
+  '</defs>';
+  var r,c;
+  for(r=0;r<3;r++)for(c=0;c<5;c++){
+    var x=CX[c],y=RY[r];
+    var hx2=c<4?CX[c+1]-R-6:TX-6;
+    o+='<path class="e" data-e="'+r+'-'+c+'-y" d="M'+(x+R+4)+' '+y+'H'+hx2+'"/>';
+    var vy2=r<2?RY[r+1]-R-6:BY-6;
+    o+='<path class="e" data-e="'+r+'-'+c+'-n" d="M'+x+' '+(y+R+4)+'V'+vy2+'"/>';
+  }
+  for(r=0;r<3;r++)for(c=0;c<5;c++){
+    o+='<g class="n" data-n="'+r+'-'+c+'"><circle cx="'+CX[c]+'" cy="'+RY[r]+'" r="'+R+'"/>'+tlines(Q[r][c].l,CX[c],RY[r],"lbl")+
+       '<text class="qm" x="'+CX[c]+'" y="'+(RY[r]+8)+'" text-anchor="middle">?</text></g>';
+  }
+  var k=0;
+  RIGHT.forEach(function(key,i){
+    var y=RY[i];
+    o+='<g class="t" data-t="'+key+'" style="animation-delay:'+(k++*0.12)+'s"><rect x="'+TX+'" y="'+(y-46)+'" width="'+TW+'" height="92" rx="12"/>'+tlines(T[key].label,TX+TW/2,y,"real")+
+       '<text class="mk" x="'+(TX+TW/2)+'" y="'+(y+9)+'" text-anchor="middle">？</text></g>';
+  });
+  BOTTOM.forEach(function(key,i){
+    var x=CX[i];
+    o+='<g class="t" data-t="'+key+'" style="animation-delay:'+(k++*0.12)+'s"><rect x="'+(x-BW/2)+'" y="'+BY+'" width="'+BW+'" height="'+BH+'" rx="12"/>'+tlines(T[key].label,x,BY+BH/2,"real")+
+       '<text class="mk" x="'+x+'" y="'+(BY+BH/2+9)+'" text-anchor="middle">？</text></g>';
+  });
+  o+='</svg><div class="legend"><span><b>→</b> YES　<span style="color:#9AA6CC">↓</span> NO</span><span>磁石祭製作委員会2027 Yes/Noチャート</span></div>';
+  return o;
+}
+function mountBoard(el,id,masked){
+  el.innerHTML=boardSVG(id);
+  el.classList.toggle("masked",!!masked);
+  el.querySelectorAll(".e").forEach(function(p){p.style.markerEnd="url(#arrDim"+id+")";});
+}
+function paint(el,id,st){
+  el.querySelectorAll(".n").forEach(function(g){g.classList.remove("done","cur");g.querySelector("circle").style.filter="";});
+  el.querySelectorAll(".e").forEach(function(p){
+    var lit=st.edges.indexOf(p.getAttribute("data-e"))>=0;
+    if(lit&&!p.classList.contains("lit")){p.classList.add("lit");p.style.markerEnd="url(#arrLit"+id+")";p.style.filter="url(#glowP"+id+")";}
+    if(!lit&&p.classList.contains("lit")){p.classList.remove("lit");p.style.markerEnd="url(#arrDim"+id+")";p.style.filter="";}
+  });
+  st.done.forEach(function(k){var g=el.querySelector('[data-n="'+k+'"]');if(g)g.classList.add("done");});
+  if(st.cur){var g=el.querySelector('[data-n="'+st.cur+'"]');if(g){g.classList.add("cur");g.querySelector("circle").style.filter="url(#glowY"+id+")";}}
+  el.querySelectorAll(".t").forEach(function(g){
+    var k=g.getAttribute("data-t");
+    g.classList.toggle("win",k===st.win);
+    g.classList.toggle("alt",k===st.alt);
+    g.querySelector("rect").style.filter=(k===st.win)?"url(#glowP"+id+")":"";
+  });
+}
+
+/* ===== 状態 ===== */
+var S={pos:{r:0,c:0},hist:[],team:null,node:null,sub:[],unit:null,slide:0};
+var $=function(id){return document.getElementById(id);};
+var introB=$("introBoard"), playB=$("playBoard");
+mountBoard(introB,"a",true);
+mountBoard(playB,"b",true);
+
+function boardState(){
+  return {
+    edges:S.hist.map(function(h){return h.r+"-"+h.c+"-"+(h.a?"y":"n");}),
+    done:S.hist.map(function(h){return h.r+"-"+h.c;}),
+    cur:S.team?null:(S.pos.r+"-"+S.pos.c),win:null,alt:null};
+}
+function show(id){
+  ["intro","play","result"].forEach(function(s){$(s).hidden=(s!==id);});
+  $("deadline").hidden=(id==="play"||id==="result");
+}
+
+function renderQ(){
+  var qt=$("qText");
+  if(!S.team){
+    $("qPhase").textContent="STEP 1｜あなたの行き先をさがす";
+    $("qCount").textContent="Q"+(S.hist.length+1);
+    qt.textContent=Q[S.pos.r][S.pos.c].t;
+    $("qHint").textContent="深く考えすぎず、直感で選んでOK。";
+  }else{
+    $("qPhase").textContent="STEP 2｜"+T[S.team].name+"の中で、もっと深く";
+    $("qCount").textContent="Q"+(S.hist.length+S.sub.length+1);
+    qt.textContent=S.node.q;
+    $("qHint").textContent="チームの中で、あなたが一番輝ける場所をしぼりこんでいます。";
+  }
+  qt.classList.remove("in");void qt.offsetWidth;qt.classList.add("in");
+  $("backBtn").disabled=(S.hist.length===0&&!S.team);
+  var st=boardState(); if(S.team){st.win=null;}
+  paint(playB,"b",st);
+}
+
+function answer(a){
+  if(!S.team){
+    var r=S.pos.r,c=S.pos.c;
+    S.hist.push({r:r,c:c,a:a});
+    if(a){ if(c===4){finishLattice(RIGHT[r]);return;} S.pos={r:r,c:c+1}; }
+    else { if(r===2){finishLattice(BOTTOM[c]);return;} S.pos={r:r+1,c:c}; }
+    renderQ();
+  }else{
+    var nxt=a?S.node.y:S.node.n;
+    S.sub.push({q:S.node.q,a:a,node:S.node});
+    if(typeof nxt==="string"){S.unit=nxt;revealUnit();}
+    else{S.node=nxt;renderQ();}
+  }
+}
+function back(){
+  if(S.team){
+    if(S.sub.length){var last=S.sub.pop();S.node=last.node;renderQ();return;}
+    S.team=null;S.node=null;
+  }
+  if(!S.hist.length)return;
+  var h=S.hist.pop();S.pos={r:h.r,c:h.c};renderQ();
+}
+function reset(toIntro){
+  S={pos:{r:0,c:0},hist:[],team:null,node:null,sub:[],unit:null,slide:0};
+  if(toIntro){show("intro");window.scrollTo(0,0);return;}
+  show("play");renderQ();window.scrollTo(0,0);
+}
+
+/* ===== 発表演出 ===== */
+var RM=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function confetti(){
+  if(RM)return;
+  var b=$("burst");b.innerHTML="";
+  var cols=["#FF2D87","#FFE45C","#4A8BF5","#ffffff"];
+  for(var i=0;i<70;i++){
+    var e=document.createElement("i");
+    e.style.left=(Math.random()*100)+"%";
+    e.style.background=cols[i%4];
+    e.style.animationDuration=(1.6+Math.random()*1.8)+"s";
+    e.style.animationDelay=(Math.random()*.5)+"s";
+    b.appendChild(e);
+  }
+}
+var rvAction=null;
+function runReveal(o){
+  var tm=$("rvTeam"),en=$("rvEn"),ca=$("rvCatch"),bt=$("rvBtns");
+  [tm,en,ca,bt].forEach(function(e){e.classList.remove("go","go-fade");e.style.animationDelay="";});
+  $("burst").innerHTML="";
+  $("rvPre").textContent=o.pre; en.textContent=o.en; tm.textContent=o.title; ca.textContent=o.sub;
+  tm.classList.toggle("sm",!!o.small);
+  $("rvNext").textContent=o.btn; $("rvNote").textContent=o.note||"";
+  rvAction=o.action;
+  $("reveal").hidden=false;
+  var d=RM?0:1300;
+  setTimeout(function(){tm.classList.add("go");en.classList.add("go-fade");confetti();},d);
+  setTimeout(function(){ca.classList.add("go-fade");},d+500);
+  /* チーム名の余韻を残してから、次のボタンを出す */
+  setTimeout(function(){bt.classList.add("go-fade");$("rvNext").focus({preventScroll:true});},RM?0:d+1900);
+}
+function finishLattice(team){
+  S.team=team;
+  var t=T[team];
+  S.node=(typeof t.tree==="string")?null:t.tree;
+  paint(playB,"b",boardState());
+  runReveal({pre:"あなたが一番輝けるチームは……",en:t.en,title:t.name,sub:t.catch,
+    btn:S.node?"もっと深く診断する":"あなたの結果を見る",
+    note:S.node?"チームの中の、あなたの居場所を見つけます":"2027年度に生まれた、いちばん新しいチームです",
+    action:function(){
+      if(S.node){renderQ();window.scrollTo(0,0);}
+      else{S.unit=t.tree;startResult();}
+    }});
+}
+function revealUnit(){
+  var t=T[S.team],u=t.units[S.unit];
+  runReveal({pre:t.name+"の中で、あなたは……",en:u.name,title:u.nick,sub:"あなたにぴったりの役割が見つかりました。",small:true,
+    btn:"あなたの結果を見る",note:"",action:startResult});
+}
+$("rvNext").addEventListener("click",function(){$("reveal").hidden=true;if(rvAction)rvAction();});
+/* 最後の答えを取り消して、質問に戻る（発表画面・結果1枚目から） */
+function undoLast(){
+  $("reveal").hidden=true;
+  S.unit=null;
+  if(S.sub.length){var l=S.sub.pop();S.node=l.node;}
+  else{S.team=null;S.node=null;var h=S.hist.pop();if(h)S.pos={r:h.r,c:h.c};}
+  show("play");renderQ();window.scrollTo(0,0);
+}
+$("rvBack").addEventListener("click",undoLast);
+$("restartBtn").addEventListener("click",function(){reset(false);});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!$("reveal").hidden)undoLast();});
+
+/* ===== 結果（1枚ずつ開示） ===== */
+function esc(s){return String(s).replace(/[&<>"]/g,function(m){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m];});}
+function li(arr){return arr.map(function(x){return "<li>"+esc(x)+"</li>";}).join("");}
+function deadlineText(){
+  var ms=DEADLINE-new Date();
+  if(ms<=0)return {open:false,txt:"応募は締め切りました"};
+  var d=Math.floor(ms/864e5),h=Math.floor(ms%864e5/36e5),m=Math.floor(ms%36e5/6e4);
+  return {open:true,txt:"締切 11/2（月）11:59まで あと"+(d>0?d+"日":"")+h+"時間"+(d>0?"":m+"分")};
+}
+function reasonText(){
+  var t=T[S.team],u=t.units[S.unit];
+  var yes=S.hist.filter(function(h){return h.a;}).map(function(h){return Q[h.r][h.c].tr;});
+  var picks=yes.slice(-3);
+  if(!picks.length){
+    return "あなたは、目立つ場所に飛び込むより、自分の手で確かなものを形にしたい人。その力が一番生きるのが、<em>"+esc(t.name)+"</em>の<em>"+esc(u.name)+"</em>です。";
+  }
+  return "あなたの答えから見えたのは、"+picks.map(function(p){return "<em>"+esc(p)+"</em>";}).join("、")+"。その力が一番生きるのが、"+esc(t.name)+"の<em>"+esc(u.name)+"</em>です。";
+}
+var SLIDES=[
+ {k:"hero",n:"結果"},
+ {k:"why",n:"向いている理由"},
+ {k:"job",n:"あなたの仕事"},
+ {k:"stat",n:"このチームの実績"},
+ {k:"route",n:"あなたが通ってきた道"},
+ {k:"apply",n:"応募する"},
+ {k:"more",n:"もっと知る"}
+];
+function slideHTML(k){
+  var t=T[S.team],u=t.units[S.unit],multi=Object.keys(t.units).length>1;
+  if(k==="hero") return '<div class="slide hero-s"><div class="kicker">あなたに向いているチームは</div><div class="tname">'+esc(t.name)+'</div>'+
+    '<div class="type"><b>'+esc(u.nick)+'</b><span>'+esc(u.name)+(multi?" タイプ":"")+'</span></div><p class="catch">'+esc(t.catch)+'</p></div>';
+  if(k==="why") return '<div class="slide"><h2>なぜ、'+esc(t.name)+'なのか</h2><p class="reason">'+reasonText()+'</p>'+
+    '<div class="fit-head">'+esc(t.name)+'に向いているのは</div><ul class="fit">'+li(t.fit)+'</ul></div>';
+  if(k==="job") return '<div class="slide"><h2>あなたがやること</h2><div class="unitname">'+esc(u.name)+'</div><ul class="jobs">'+li(u.jobs)+'</ul><p class="desc">'+esc(t.desc)+'</p></div>';
+  if(k==="stat"){var num=t.stat.raw?String(t.stat.n):t.stat.n.toLocaleString("ja-JP");
+    return '<div class="slide"><h2>'+esc(t.name)+'がつくったもの</h2><div class="big"><span id="countUp" data-n="'+t.stat.n+'" data-raw="'+(t.stat.raw?1:0)+'">'+num+'</span><small>'+esc(t.stat.u)+'</small></div>'+
+    '<div class="stat-lab">'+esc(t.stat.lab)+'</div><div class="stat-note">'+esc(t.stat.note)+'</div>'+
+    (t.voice?'<div class="voice"><span>'+esc(t.voice.k)+'</span>'+esc(t.voice.v)+'</div>':'')+'</div>';}
+  if(k==="route"){
+    var route=S.hist.map(function(h){return {q:Q[h.r][h.c].t,a:h.a};}).concat(S.sub.map(function(s){return {q:s.q,a:s.a};}));
+    return '<div class="slide"><h2>あなたが通ってきた道</h2><p style="color:var(--muted);font-size:14px">伏せていた行き先を明かします。'+route.length+'回の選択が、ここにつながりました。</p>'+
+    '<div class="board" id="resBoard" style="padding:6px;border:0;background:none"></div>'+
+    '<ul class="route">'+route.map(function(x){return '<li><span class="yn '+(x.a?"y":"n")+'">'+(x.a?"YES":"NO")+'</span><span>'+esc(x.q)+'</span></li>';}).join("")+'</ul></div>';}
+  if(k==="apply"){var dl=deadlineText();
+    return '<div class="slide apply-s"><h2>'+(dl.open?"このチームで、<br>日本一の文化祭をつくろう。":"今年の募集は締め切りました")+'</h2>'+
+    '<div class="fit-head">今年はこんなことに挑戦！</div><div class="chips">'+t.challenge.map(function(x){return '<span class="chip">'+esc(x)+'</span>';}).join("")+'</div>'+
+    (t.skills.length?'<div class="fit-head" style="margin-top:14px">身につく力</div><div class="chips">'+t.skills.map(function(x){return '<span class="chip">'+esc(x)+'</span>';}).join("")+'</div>':'')+
+    (dl.open?'<a class="apply-btn" href="'+APPLY_URL+'" target="_blank" rel="noopener">応募フォームへ</a>':'')+
+    '<div class="dl" id="applyDl">'+esc(dl.txt)+'</div><div class="small">応募には生徒用Googleアカウントでのログインが必要です。第1希望の参考に、診断結果を使ってください。</div></div>';}
+  if(k==="more"){var alt=T[NEXT[S.team]];
+    var shareTxt="磁石祭製作委員会2027のYes/Noチャートをやってみたら、「"+t.name+"｜"+u.nick+"」だった！ 一緒に応募しない？ 応募締切は11/2（月）11:59";
+    var sendBtn=RESULT_FORM_URL?'<a class="btn pri" target="_blank" rel="noopener" href="'+esc(RESULT_FORM_URL.replace("{team}",encodeURIComponent(t.name)).replace("{unit}",encodeURIComponent(u.name)))+'">診断結果を送る</a>':"";
+    return '<div class="slide extra">'+
+     '<div><h3>もう一つの可能性</h3><div class="alt-name">'+esc(alt.name)+'</div><p style="color:var(--muted);font-size:13px;margin:4px 0 0">最後の分かれ道で逆を選ぶと、このチームの方向へ進んでいました。第2希望を考えるときの参考に。</p></div><hr class="sep">'+
+     (multi?'<div><h3>'+esc(t.name)+'の班</h3><div class="units">'+Object.keys(t.units).map(function(x){var v=t.units[x];return '<div class="unit'+(x===S.unit?' me':'')+'"><b>'+esc(v.name)+'</b>'+esc(v.jobs[0])+'</div>';}).join("")+'</div></div><hr class="sep">':'')+
+     '<div class="share"><h3>友達を誘う</h3><p style="margin:0;color:var(--muted);font-size:13px">一緒に応募できる仲間がいると心強い。結果をコピーして送ってみよう。</p><textarea id="shareTxt" readonly>'+esc(shareTxt)+'</textarea>'+
+     '<div class="row-btns"><button class="btn pri" id="copyBtn">結果をコピー</button>'+sendBtn+'</div><div class="copied" id="copied"></div></div><hr class="sep">'+
+     '<div><h3>ほかのチームも見る</h3><div class="tlist">'+ORDER.map(function(key){var x=T[key];
+        return '<details class="tc'+(key===S.team?' me':'')+'"><summary><b>'+esc(x.name)+'</b><span>'+esc(x.catch)+'</span></summary><div class="body">'+esc(x.desc)+
+        '<ul>'+Object.keys(x.units).map(function(z){return "<li>"+esc(x.units[z].name)+"</li>";}).join("")+'</ul></div></details>';}).join("")+'</div></div><hr class="sep">'+
+     '<div><h3>もう一度やる</h3><p style="margin:0;color:var(--muted);font-size:13px">答えを変えると、ちがうチームが見えてきます。</p><div class="row-btns"><button class="btn pri" id="againBtn">もう一回診断する</button><button class="btn" id="topBtn">トップへ戻る</button></div></div>'+
+    '</div>';}
+}
+var ORDER=["stage","studio","booth","online","pr","creative","prepost","obog"];
+function startResult(){S.slide=0;show("result");renderSlide();}
+function renderSlide(){
+  var s=SLIDES[S.slide];
+  $("steps").innerHTML=SLIDES.map(function(_,i){return '<i class="'+(i<=S.slide?"on":"")+'"></i>';}).join("");
+  $("sName").textContent=s.n; $("sNum").textContent=(S.slide+1)+" / "+SLIDES.length;
+  $("slideBox").innerHTML=slideHTML(s.k);
+  $("prevBtn").textContent=S.slide===0?"← 答えを直す":"← 戻る";
+  $("nextBtn").hidden=(S.slide===SLIDES.length-1);
+  $("nextBtn").textContent=S.slide===SLIDES.length-2?"もっと知る":"次へ";
+  if(s.k==="stat")countUp();
+  if(s.k==="route"){
+    var rb=$("resBoard");mountBoard(rb,"c",true);
+    var st=boardState();st.cur=null;paint(rb,"c",st);
+    setTimeout(function(){rb.classList.remove("masked");rb.classList.add("unveil");
+      var st2=boardState();st2.cur=null;st2.win=S.team;paint(rb,"c",st2);},RM?0:700);
+  }
+  if(s.k==="more"){
+    $("copyBtn").addEventListener("click",copyShare);
+    $("againBtn").addEventListener("click",function(){reset(false);});
+    $("topBtn").addEventListener("click",function(){reset(true);});
+  }
+  window.scrollTo(0,0);
+}
+$("nextBtn").addEventListener("click",function(){if(S.slide<SLIDES.length-1){S.slide++;renderSlide();}});
+$("prevBtn").addEventListener("click",function(){if(S.slide>0){S.slide--;renderSlide();}else{undoLast();}});
+function countUp(){
+  var el=$("countUp");if(!el||RM)return;
+  var n=+el.getAttribute("data-n"),raw=el.getAttribute("data-raw")==="1",t0=null,D=1400;
+  function step(ts){if(!t0)t0=ts;var p=Math.min(1,(ts-t0)/D),v=Math.round(n*(1-Math.pow(1-p,3)));
+    el.textContent=raw?String(v):v.toLocaleString("ja-JP");if(p<1)requestAnimationFrame(step);}
+  el.textContent="0";requestAnimationFrame(step);
+}
+function copyShare(){
+  var ta=$("shareTxt"),msg=$("copied");
+  function fallback(){ta.focus();ta.select();try{var ok=document.execCommand("copy");msg.textContent=ok?"コピーしました":"テキストを長押し（または選択）してコピーしてください";}catch(e){msg.textContent="テキストを長押し（または選択）してコピーしてください";}}
+  try{
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(ta.value).then(function(){msg.textContent="コピーしました";},fallback);
+    }else fallback();
+  }catch(e){fallback();}
+}
+
+/* ===== 締切表示 ===== */
+function tick(){
+  var d=deadlineText();
+  $("dl-text").textContent=d.open?d.txt:"応募は締め切りました";
+  var a=$("applyDl");if(a)a.textContent=d.txt;
+}
+tick();setInterval(tick,30000);
+
+/* ===== 操作 ===== */
+$("startBtn").addEventListener("click",function(){reset(false);});
+$("yesBtn").addEventListener("click",function(){answer(true);});
+$("noBtn").addEventListener("click",function(){answer(false);});
+$("backBtn").addEventListener("click",back);
+$("resetBtn").addEventListener("click",function(){reset(true);});
+document.addEventListener("keydown",function(e){
+  if($("play").hidden||!$("reveal").hidden)return;
+  if(e.key==="y"||e.key==="Y"||e.key==="ArrowRight")answer(true);
+  if(e.key==="n"||e.key==="N"||e.key==="ArrowDown")answer(false);
+});
+paint(introB,"a",{edges:[],done:[],cur:"0-0",win:null,alt:null});
+})();
+</script>
+
+</body>
+</html>
